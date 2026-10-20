@@ -29,7 +29,7 @@ class PT25ROS(Node):
         self.get_logger().info('Connecting to PT25 device at %s:%d' % (self.port, self.baudrate))
 
         while self.pt25.get_settings(self.address) != 0:
-            self.get_logger().warn('Unable to connect to ROS Pan/Tilt, Retrying every 1 sec', once=True)
+            self.get_logger().warning('Unable to connect to ROS Pan/Tilt, Retrying every 1 sec', once=True)
             time.sleep(1.0)
 
         self.get_logger().info('PT25 factory ccw limit %d' % (self.pt25.settings[self.address]['factory_ccw_limit'])) # factory limit is 5
@@ -125,7 +125,7 @@ class PT25ROS(Node):
 
         # If different speed but too soon, drop it (optional: log once)
         if speed != self.speed and (now - self.last_speed_cmd) < self.min_cmd_duration:
-            self.get_logger().warn('Ignoring speed command: min_cmd_delay not met', throttle_duration_sec=1.0)
+            self.get_logger().warning('Ignoring speed command: min_cmd_delay not met', throttle_duration_sec=1.0)
             return
 
         # Send to device
@@ -142,7 +142,7 @@ class PT25ROS(Node):
     def poll(self, address):
         roll = self.pt25.poll(address)
         if roll < 0:
-            self.get_logger().warn(f'Invalid position: {roll:.3f}', throttle_duration_sec=60.0)
+            self.get_logger().warning(f'Invalid position: {roll:.3f}', throttle_duration_sec=60.0)
             return
         roll_msg = JointState()
         roll_msg.header.stamp = self.get_clock().now().to_msg()
